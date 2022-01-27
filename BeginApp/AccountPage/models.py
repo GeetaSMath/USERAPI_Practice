@@ -1,12 +1,9 @@
-from django.db import models
+from django.contrib.auth.models import User
 
 
-class User(models.Model):
-    """
-    created this class for table in database
-    """
-    user_name = models.CharField(max_length=200)
-    password = models.CharField(max_length=20)
-    email = models.EmailField(max_length=40)
+class User(User):
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['first_name','last_name', 'password', 'username']
 
-
+    def __str__(self):
+        return self.email
