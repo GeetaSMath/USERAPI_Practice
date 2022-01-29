@@ -2,44 +2,57 @@ import json
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 
-@csrf_exempt
-def user_registration(request):
-    """
-    this method is created for user registration
-    :param request: passing the request
-    :return: outcome result
-    """
-    try:
-        if request.method == "POST":
-            data = json.loads(request.body)
+class UserRegistration(APIView):
+    def post(self, request):
+
+        """
+        this method is created for user registration
+        :param request: passing the request
+        :return: outcome result
+        """
+        try:
+            data = request.data
             user_name = data.get("user_name")
+            first_name = data.get("first_name")
+            last_name = data.get("last_name")
             password = data.get("password")
             email = data.get("email")
-            user = User(user_name=user_name, password=password, email=email)
+            user = User(username=user_name, password=password, email=email, first_name=first_name, last_name=last_name)
             user.save()
             return HttpResponse("Data stored successfully")
-    except Exception as e:
-        return "Error"
 
-@csrf_exempt
-def user_login(request):
-    """
-    this method is created for user_login
-    :param request: web request for login
-    :return:
-    """
-    try:
-        if request.method == "POST":
-            data = json.loads(request.body)
-            user_name = data["user_name"]
-            password = data["password"]
+        except Exception as e:
+            print(e)
+            return HttpResponse("Raise an error"+e.__str__())
 
-            if User.objects.filter(user_name=user_name, password=password):
-                return HttpResponse("User is exist")
-    except Exception as e:
-        return "Error"
+    def get(self, request):
+        """
+        :param request:
+        :return:
+        """
+        try:
+            data = User.objects.get()
+            print(data)
+            Data_list=[]
+            for i in data:
+                Data_list.append(i)
+            return Data_list
 
+        except Exception as e:
+            print(e)
+            return HttpResponse("Raise an error" + e.__str__())
 
+    def delete(self, request, email, format=None):
+        """"""
+        try:
+            data = self.get_object(email)
+            data.delete()
+
+        except Exception as e:
+                print(e)
+                return HttpResponse("Raise an error" + e.__str__())
 
