@@ -1,10 +1,6 @@
-import json
 from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
-from rest_framework.response import Response
 from rest_framework.views import APIView
-
 
 class UserRegistration(APIView):
     def post(self, request):
@@ -35,24 +31,34 @@ class UserRegistration(APIView):
         :return:
         """
         try:
-            data = User.objects.get()
-            print(data)
-            Data_list=[]
-            for i in data:
-                Data_list.append(i)
-            return Data_list
-
+            data = User.objects.all()
+            user_data = []
+            for obj in data:
+                user_dict = {"username": obj.username, "password": obj.password, "email": obj.email,"first_name": obj.first_name,
+                             "last_name": obj.last_name}
+                user_data.append(user_dict)
+                return HttpResponse(user_data)
         except Exception as e:
-            print(e)
-            return HttpResponse("Raise an error" + e.__str__())
+            return HttpResponse("Raise an error"+e.__str__())
 
-    def delete(self, request, email, format=None):
+
+    def put (self, request):
+        try:
+            user = User.objects.get(username=request.data['username'])
+            user.password = request.data['password']
+            user.email = request.data['email']
+            user.first_name = request.data['first_name']
+            user.last_name = request.data['last_name']
+            user.save()
+            return HttpResponse("data updated")
+        except Exception as e:
+            return HttpResponse("Raise an error"+e.__str__())
+
+    def delete (self, request):
         """"""
         try:
-            data = self.get_object(email)
-            data.delete()
-
+            user = User.objects.get(username=request.data['username'])
+            user.delete()
+            return HttpResponse("User deleted successfully")
         except Exception as e:
-                print(e)
-                return HttpResponse("Raise an error" + e.__str__())
-
+            return HttpResponse("Raise an error"+e.__str__())
