@@ -1,7 +1,9 @@
-from django.urls import path
+from idlelib.multicall import r
+
+from django.urls import path, re_path
 from . import views
 
 urlpatterns = [
     path('user_registration/', views.UserRegistration.as_view(), name='user_registration'),
-    # path('user_login', views.user_login, name='user_login'),
+    re_path(r'^user_registration/(?P<username>[\w0-9-]+)/$', views.UserRegistration.as_view(),name='user_registration'),
 ]
